@@ -5,7 +5,7 @@ A Telegram bot that keep track of when your dog last did her business and remind
 
 ## Installation:
  - use [Telegram Botfather](https://core.telegram.org/bots) to create a bot and an access token for it
- - write a JSON file called `.env` in the root of this repo containing your access token: `{"telegram_poppee": "5149933138:AAEb8gfapAlKAQ_Gts1tcE_QuT1r1Kl72Ns"}` 
+ - write a JSON file called `.env` in the root of this repo containing your access token: `{"telegram_poppee": "1234:ABCDEFG"}` 
  - install python > 3.6 and the bot's dependencies on your server: `pip install -r requirements.txt`
  - edit the constants at the top of the Python file to customise how often your dog needs to pee and how often you want to be notified
  - setup the bot to run as a systemd service: `sudo cp poppee.service /lib/systemd/system/`

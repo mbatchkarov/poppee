@@ -1,7 +1,7 @@
 # Poppee service
 
 ## Intro
-A Telegram bot that keep track of when your dog last did her business and reminds you. This started as a joke but we actually find it useful day-to-day, so I'm open-sourcing it in the hope that some else likes it too. The main design goal is simplicity over anything else.  It is a sinle Python file with minimal dependencies. All data is stored in a local SQLite DB and can be self hosted. I host it on a Raspberry Pi Zero, which is plenty fast for such an app.
+A Telegram bot that keep track of when your dog last did her business and reminds you. This started as a joke but we actually find it useful day-to-day, so I'm open-sourcing it in the hope that some else likes it too. The main design goal is simplicity over anything else. Not even tests. It is a single Python file with minimal dependencies. All data is stored in a local SQLite DB and can be self hosted. I host it on a Raspberry Pi Zero, which is plenty fast for such an app.
 
 ## Installation:
  - use [Telegram Botfather](https://core.telegram.org/bots) to create a bot and an access token for it

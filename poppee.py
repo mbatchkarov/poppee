@@ -1,22 +1,17 @@
 import json
 import datetime
 import time
-from threading import Lock, Thread
+from threading import Thread
 
 import pytz
 import telebot
-from pyexpat.errors import messages
 from telebot import types
 
 with open(".env") as infile:
     conf = json.load(infile)
 
-lock = Lock()
-
 # https://github.com/eternnoir/pyTelegramBotAPI
-bot = telebot.TeleBot(
-    conf["telegram_poppee"], parse_mode=None
-)  # You can set parse_mode by default. HTML or MARKDOWN
+bot = telebot.TeleBot(conf["telegram_poppee"], parse_mode=None)
 PEE_INTERVAL_MINUTES = 180
 NAG_INTERVAL_MINUTES = 5
 
@@ -87,8 +82,7 @@ def subscribe(chat_id, username) -> dict:
     )
     subscriber = User.replace(
         chat_id=chat_id, next_ping=next_ping, name=username
-    ).execute()
-    # subscriber.save()
+    ).execute()  # this does an upsert
 
 
 def remind():
@@ -114,9 +108,8 @@ def remind():
 
 @bot.message_handler(commands=["start", "sub"])
 def handle_sub_command(message):
-    with lock:
-        subscribe(message.chat.id, message.chat.first_name)
-        time_since_pee_s = time.time() - get_pepee_time()
+    subscribe(message.chat.id, message.chat.first_name)
+    time_since_pee_s = time.time() - get_pepee_time()
     bot.send_message(
         message.chat.id,
         f"Subscribed you. Last pee was ~{round(time_since_pee_s / 3600, 1)}h ago. Interval between pees is {PEE_INTERVAL_MINUTES} minutes",
@@ -188,13 +181,6 @@ def handle_message(message):
             message.chat.id,
             "You cannot update pee time, subscribe for notifications first",
         )
-
-    # started working on snoozing but can't be fucked now...
-    # numbers = re.findall(r'\d+\.?\d?', message.text)
-    # if numbers:
-    #     if numbers[0] > 3: # assume they mean minutes, otherwise hours
-    #         new_duration = int(numbers[0])
-    # else:
 
 
 if __name__ == "__main__":

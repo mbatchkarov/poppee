@@ -1,0 +1,19 @@
+# install: sudo cp poppee.service /lib/systemd/system/
+# start: sudo systemctl start poppee.service
+# check it's running: systemctl --type=service | grep pop
+# restart: sudo systemctl restart poppee.service
+
+[Unit]
+Description=Systemd Service for Poppee telegram bot
+After=network-online.target
+ 
+[Service]
+ExecStart=/bin/python3 /home/pi/mimmaesnotifier/poppee.py
+WorkingDirectory=/home/pi/mimmaesnotifier
+StandardOutput=file:/home/pi/mimmaesnotifier/poppee.log
+StandardError=file:/home/pi/mimmaesnotifier/poppee.log
+Restart=always
+User=pi
+ 
+[Install]
+WantedBy=multi-user.target

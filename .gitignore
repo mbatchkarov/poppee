@@ -1,0 +1,6 @@
+.env
+*pyc
+*sqlite
+*log
+
+notifier.py

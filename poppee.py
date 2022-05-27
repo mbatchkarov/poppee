@@ -20,7 +20,6 @@ bot = telebot.TeleBot(
 PEE_INTERVAL_MINUTES = 180
 NAG_INTERVAL_MINUTES = 5
 
-PEE_TIME_FILE = "peepee.txt"
 CHAT_IDS_FILE = "data.sqlite"
 
 QUICK_PEE_BUTTON = types.ReplyKeyboardMarkup(row_width=2)
@@ -29,25 +28,38 @@ QUICK_PEE_BUTTON.add(types.KeyboardButton("SHE PEED!"))
 
 CLOSE_BUTTONS = types.ReplyKeyboardRemove(selective=False)
 
-from peewee import SqliteDatabase, Model, IntegerField, CharField, DateTimeField, AutoField, ForeignKeyField, fn
+from peewee import (
+    SqliteDatabase,
+    Model,
+    IntegerField,
+    CharField,
+    DateTimeField,
+    AutoField,
+    ForeignKeyField,
+    fn,
+)
 import datetime
 
 
 STATE = SqliteDatabase(CHAT_IDS_FILE)
 
+
 class BaseModel(Model):
     class Meta:
         database = STATE
+
 
 class User(BaseModel):
     chat_id = IntegerField(unique=True, index=True)
     name = CharField()
     next_ping = DateTimeField(default=None)
 
+
 class Pee(BaseModel):
     id = AutoField(unique=True, index=True, primary_key=True)
     time = DateTimeField(index=True)
     user_id = ForeignKeyField(User, lazy_load=True)
+
 
 STATE.connect()
 STATE.create_tables([User, Pee])
@@ -60,14 +72,22 @@ def write_pepee_time(user_id):
         user.next_ping = int(time.time()) + PEE_INTERVAL_MINUTES * 60
         user.save()
 
+
 def get_pepee_time() -> float:
     pee = Pee.select(fn.MAX(Pee.time)).scalar()
-    return pee or 0 # if no pee recorded, assume it's ages ago
+    return pee or 0  # if no pee recorded, assume it's ages ago
+
 
 def subscribe(chat_id, username) -> dict:
     ids = User.select()
-    next_ping = max(user.next_ping for user in ids) if ids else (int(time.time()) + PEE_INTERVAL_MINUTES * 60)
-    subscriber = User.replace(chat_id=chat_id, next_ping=next_ping, name=username).execute()
+    next_ping = (
+        max(user.next_ping for user in ids)
+        if ids
+        else (int(time.time()) + PEE_INTERVAL_MINUTES * 60)
+    )
+    subscriber = User.replace(
+        chat_id=chat_id, next_ping=next_ping, name=username
+    ).execute()
     # subscriber.save()
 
 
@@ -130,10 +150,13 @@ def handle_unsub_command(message):
         reply_markup=CLOSE_BUTTONS,
     )
 
+
 @bot.message_handler(commands=["snooze"])
 def handle_snooze_command(message):
     for user in User.select():
-        user.next_ping = int(time.time()) + (4 * NAG_INTERVAL_MINUTES * 60) # skip 4 nag intervals
+        user.next_ping = int(time.time()) + (
+            4 * NAG_INTERVAL_MINUTES * 60
+        )  # skip 4 nag intervals
         user.save()
     bot.send_message(
         message.chat.id,
@@ -141,15 +164,16 @@ def handle_snooze_command(message):
         reply_markup=QUICK_PEE_BUTTON,
     )
 
+
 @bot.message_handler(func=lambda message: True)
 def handle_message(message):
     # print("Got message", message)
-    if 'snooze' in message.text.lower():
+    if "snooze" in message.text.lower():
         return handle_snooze_command(message)
 
     this_chat_id = message.chat.id
     sub = User.get(User.chat_id == this_chat_id)
-    if sub: # we have a subscriber
+    if sub:  # we have a subscriber
         write_pepee_time(sub.chat_id)
         for user in User.select():
             user.next_ping = int(time.time()) + (PEE_INTERVAL_MINUTES * 60)

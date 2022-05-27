@@ -22,3 +22,7 @@ A Telegram bot that keep track of when your dog last did her business and remind
  ## Why Telegram
 
  Messaging apps are the easiest cross-platform way to send a push notification a device and receive a basic response back. Building a mobile/desktop app is easy but would have worked been much more work. Out of all the messaging apps I use, Telegram has the simplest API.
+ 
+ ## Example
+ 
+ [<img alt="example" width="250px" src="poppee.PNG" />](example)

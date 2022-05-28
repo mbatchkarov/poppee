@@ -27,7 +27,7 @@ CLOSE_BUTTONS = types.ReplyKeyboardRemove(selective=False)
 
 
 def write_pepee_time(user_id):
-    pee_time = int(time.time())  # the the nearest second
+    pee_time = int(time.time())  # round to the nearest second
     Pee(time=pee_time, user_id=user_id).save()
     User.update(
         {User.next_ping: int(time.time()) + PEE_INTERVAL_MINUTES * 60}
@@ -56,9 +56,11 @@ def get_time_in_berlin():
     try:
         # py < 3.9
         import pytz
+
         return datetime.datetime.now(pytz.timezone(timezone))
     except ImportError:
         from zoneinfo import ZoneInfo
+
         return datetime.datetime.now(ZoneInfo(timezone))
 
 

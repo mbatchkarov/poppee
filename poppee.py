@@ -47,7 +47,7 @@ def subscribe(chat_id: int, username: str):
         if ids
         else (int(time.time()) + PEE_INTERVAL_MINUTES * 60)
     )
-    subscriber = User.replace(
+    User.replace(
         chat_id=chat_id, next_ping=next_ping, name=username
     ).execute()  # this does an upsert
 
@@ -67,11 +67,11 @@ def remind_iterator() -> bool:
     time_since_pee_s = time.time() - get_pepee_time()
     for user in User.select():
         if user.next_ping < time.time():
-            bot.send_message(
-                user.chat_id,
-                f"Yo {user.name}, doggo needs to pee. Last pee was ~{round(time_since_pee_s / 3600, 1)}h ago. Click to mark deed as done",
-                reply_markup=QUICK_PEE_BUTTON,
+            message = (
+                f"Yo {user.name}, doggo needs to pee. Last pee was ~{round(time_since_pee_s / 3600, 1)}h "
+                f"ago. Click to mark deed as done"
             )
+            bot.send_message(user.chat_id, message, reply_markup=QUICK_PEE_BUTTON)
     return True
 
 
@@ -89,7 +89,8 @@ def handle_sub_command(message):
     time_since_pee_s = time.time() - get_pepee_time()
     bot.send_message(
         message.chat.id,
-        f"Subscribed you. Last pee was ~{round(time_since_pee_s / 3600, 1)}h ago. Interval between pees is {PEE_INTERVAL_MINUTES} minutes",
+        f"Subscribed you. Last pee was ~{round(time_since_pee_s / 3600, 1)}h "
+        f"ago. Interval between pees is {PEE_INTERVAL_MINUTES} minutes",
         reply_markup=QUICK_PEE_BUTTON,
     )
 
@@ -98,7 +99,8 @@ def handle_sub_command(message):
 def handle_help_command(message):
     bot.send_message(
         message.chat.id,
-        f"Send /info to get pee status; /sub to subscribe for notifications; /unsub to unsubscribe; any other text to record pee time",
+        "Send /info to get pee status; /sub to subscribe for notifications; "
+        "/unsub to unsubscribe; any other text to record pee time",
     )
 
 

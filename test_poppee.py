@@ -1,7 +1,7 @@
 import datetime
 
 import pytest
-from mock import patch
+from unittest.mock import patch
 from telebot.types import Message, Chat, User as TUser
 
 from .db import get_db, drop_all, Pee, User
@@ -124,6 +124,6 @@ def test_remind_sends_messages(populated_db, mock_telegram):
     with patch("poppee.poppee.get_time_in_berlin", return_value=fixed_now):
         assert remind_iterator()
         assert mock_telegram.call_count == User.select().count()
-        chat_id, msg_text = mock_telegram.mock_calls[0].args
+        chat_id, msg_text = mock_telegram.call_args[0]
         assert chat_id == chat.id
         assert "doggo needs to pee" in msg_text

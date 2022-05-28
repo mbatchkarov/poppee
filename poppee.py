@@ -4,7 +4,6 @@ import time
 from threading import Thread
 
 from peewee import fn, DoesNotExist
-import pytz
 import telebot
 from telebot import types
 
@@ -53,8 +52,14 @@ def subscribe(chat_id: int, username: str):
 
 
 def get_time_in_berlin():
-    tz = pytz.timezone("Europe/Berlin")
-    return datetime.datetime.now(tz)
+    timezone = "Europe/Berlin"
+    try:
+        # py < 3.9
+        import pytz
+        return datetime.datetime.now(pytz.timezone(timezone))
+    except ImportError:
+        from zoneinfo import ZoneInfo
+        return datetime.datetime.now(ZoneInfo(timezone))
 
 
 def remind_iterator() -> bool:

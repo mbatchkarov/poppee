@@ -1,19 +1,21 @@
 import json
+import os
+import sys
 import datetime
 import time
 from threading import Thread
 
 from peewee import fn, DoesNotExist
-import telebot
-from telebot import types
+from telebot import types, TeleBot
 
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from poppeebot.db import Pee, User, get_db
 
 with open(".env") as infile:
     conf = json.load(infile)
 
 # https://github.com/eternnoir/pyTelegramBotAPI
-bot = telebot.TeleBot(conf["telegram_poppee"], parse_mode=None)
+bot = TeleBot(conf["telegram_poppee"], parse_mode=None)
 PEE_INTERVAL_MINUTES = 180
 NAG_INTERVAL_MINUTES = 5
 

@@ -4,8 +4,8 @@ import pytest
 from unittest.mock import patch
 from telebot.types import Message, Chat, User as TUser
 
-from .db import get_db, drop_all, Pee, User
-from .poppee import (
+from poppeebot.db import get_db, drop_all, Pee, User
+from poppeebot.poppee import (
     subscribe,
     handle_unsub_command,
     handle_info_command,
@@ -24,7 +24,7 @@ msg = Message(789, user, 12345689, chat, "text", {"text": "hi"}, "")
 
 @pytest.fixture(autouse=True)
 def mock_telegram():
-    with patch("poppee.poppee.bot.send_message") as fake_telegram:
+    with patch("poppeebot.poppee.bot.send_message") as fake_telegram:
         yield fake_telegram
 
 
@@ -115,13 +115,13 @@ def test_snooze_empty_db(empty_db):
 
 def test_remind_silent_at_night():
     fixed_now = datetime.datetime(2017, 8, 21, 23, 23, 23)
-    with patch("poppee.poppee.get_time_in_berlin", return_value=fixed_now):
+    with patch("poppeebot.poppee.get_time_in_berlin", return_value=fixed_now):
         assert not remind_iterator()
 
 
 def test_remind_sends_messages(populated_db, mock_telegram):
     fixed_now = datetime.datetime(2017, 8, 21, 11, 11, 11)
-    with patch("poppee.poppee.get_time_in_berlin", return_value=fixed_now):
+    with patch("poppeebot.poppee.get_time_in_berlin", return_value=fixed_now):
         assert remind_iterator()
         assert mock_telegram.call_count == User.select().count()
         chat_id, msg_text = mock_telegram.call_args[0]

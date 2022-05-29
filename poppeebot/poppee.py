@@ -7,7 +7,7 @@ from peewee import fn, DoesNotExist
 import telebot
 from telebot import types
 
-from .db import Pee, User, get_db
+from poppeebot.db import Pee, User, get_db
 
 with open(".env") as infile:
     conf = json.load(infile)

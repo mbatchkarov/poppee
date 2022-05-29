@@ -8,7 +8,7 @@ Description=Systemd Service for Poppee telegram bot
 After=network-online.target
  
 [Service]
-ExecStart=/bin/python3 /home/pi/mimmaesnotifier/poppee.py
+ExecStart=/bin/python3 /home/pi/mimmaesnotifier/poppeebot/poppee.py
 WorkingDirectory=/home/pi/mimmaesnotifier
 StandardOutput=file:/home/pi/mimmaesnotifier/poppee.log
 StandardError=file:/home/pi/mimmaesnotifier/poppee.log

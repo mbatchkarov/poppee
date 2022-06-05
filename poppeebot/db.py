@@ -13,7 +13,14 @@ from peewee import (
 class User(Model):
     chat_id = IntegerField(unique=True, index=True)
     name = CharField()
-    next_ping = DateTimeField(default=None)
+    next_ping = DateTimeField(default=None)  # unix time, seconds since epoch
+
+    def __str__(self):
+        return f"{self.name}({self.next_ping_hours})"
+
+    @property
+    def next_ping_hours(self):
+        return self.next_ping / 3600
 
 
 class Pee(Model):

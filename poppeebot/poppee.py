@@ -17,7 +17,7 @@ with open(".env") as infile:
 # https://github.com/eternnoir/pyTelegramBotAPI
 bot = TeleBot(conf["telegram_poppee"], parse_mode=None)
 PEE_INTERVAL_MINUTES = 180
-NAG_INTERVAL_MINUTES = 5
+NAG_INTERVAL_MINUTES = 10
 
 CHAT_IDS_FILE = "data.sqlite"
 
@@ -72,7 +72,7 @@ def get_time_in_berlin():
 def remind_iterator() -> bool:
     """Return False to indicate we should be quiet"""
     berlin_now = get_time_in_berlin()
-    if berlin_now.hour >= 22 or berlin_now.hour <= 7:
+    if berlin_now.hour >= 22 or (berlin_now.hour, berlin_now.minute) <= (8, 30):
         # quiet at night
         return False
 

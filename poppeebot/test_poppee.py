@@ -140,8 +140,11 @@ def test_snooze_empty_db(empty_db):
     handle_snooze_command(pee_msg)  # no crash
 
 
-def test_remind_silent_at_night():
-    fixed_now = datetime.datetime(2017, 8, 21, 23, 23, 23)
+@pytest.mark.parametrize(
+    "hour, minutes", [(22, 30), (0, 0), (1, 10), (5, 59), (7, 10), (8, 29)]
+)
+def test_remind_silent_at_night(hour, minutes):
+    fixed_now = datetime.datetime(2017, 8, 21, hour, minutes, 23)
     with patch("poppeebot.poppee.get_time_in_berlin", return_value=fixed_now):
         assert not remind_iterator()
 

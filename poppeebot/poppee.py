@@ -165,9 +165,7 @@ def handle_your_dog_command(message):
         # this user can leave the dog to some other user
         snooze_h = 2 if message.text == YOUR_DOG_2H_TEXT else 8
         num_updated = (
-            User.update({User.next_ping: time_now() + (snooze_h * 60 * 60)})
-            .where(User.chat_id == message.chat.id)
-            .execute()
+            User.update({User.next_ping: time_now() + (snooze_h * 60 * 60)}).where(User.chat_id == message.chat.id).execute()
         )
         assert num_updated == 1
         bot.send_message(

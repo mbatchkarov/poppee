@@ -29,9 +29,7 @@ def get_chat(id=0):
 
 
 def get_msg(id=0, text="hi") -> Message:
-    return Message(
-        789 + id, get_user(id), 12345689, get_chat(id), "text", {"text": text}, ""
-    )
+    return Message(789 + id, get_user(id), 12345689, get_chat(id), "text", {"text": text}, "")
 
 
 chat = get_chat()
@@ -140,9 +138,7 @@ def test_snooze_empty_db(empty_db):
     handle_snooze_command(pee_msg)  # no crash
 
 
-@pytest.mark.parametrize(
-    "hour, minutes", [(22, 30), (0, 0), (1, 10), (5, 59), (7, 10), (8, 29)]
-)
+@pytest.mark.parametrize("hour, minutes", [(22, 30), (0, 0), (1, 10), (5, 59), (7, 10), (8, 29)])
 def test_remind_silent_at_night(hour, minutes):
     fixed_now = datetime.datetime(2017, 8, 21, hour, minutes, 23)
     with patch("poppeebot.poppee.get_time_in_berlin", return_value=fixed_now):
@@ -287,6 +283,6 @@ def test_late_pee(db_one_user):
     for the night, check that the reminder is moved to just before quiet time starts
     """
     with patch("time.time", return_value=20 * 60 * 60):
-        handle_message(pee_msg) # pee at 20:00
+        handle_message(pee_msg)  # pee at 20:00
     # next reminder is set for between 22:00 and 22:20
     assert 22 < User.get_by_id(1).next_ping_hours < 22.333

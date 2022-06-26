@@ -279,3 +279,14 @@ def test_snooze_when_not_my_dog(db_two_users, mock_telegram):
 
     chat_id, msg_text = mock_telegram.call_args_list[-1][0]
     assert msg_text == "Snoozing for 480 minutes"  # 8 hours
+
+
+def test_late_pee(db_one_user):
+    """
+    If dog pees late enough that the next reminder will be just after the quiet time starts
+    for the night, check that the reminder is moved to just before quiet time starts
+    """
+    with patch("time.time", return_value=20 * 60 * 60):
+        handle_message(pee_msg) # pee at 20:00
+    # next reminder is set for between 22:00 and 22:20
+    assert 22 < User.get_by_id(1).next_ping_hours < 22.333

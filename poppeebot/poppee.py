@@ -34,6 +34,9 @@ QUICK_PEE_BUTTON.row(types.KeyboardButton("SHE PEED!"))
 
 CLOSE_BUTTONS = types.ReplyKeyboardRemove(selective=False)
 
+NOTIF_START = (8, 30)
+NOTIF_END = (22, 30)
+
 
 def write_pepee_time(user_id):
     Pee(time=time_now(), user_id=user_id).save()
@@ -46,14 +49,8 @@ def get_last_pee_time() -> float:
 
 def subscribe(chat_id: int, username: str):
     ids = User.select()
-    next_ping = (
-        max(user.next_ping for user in ids)
-        if ids
-        else (time_now() + PEE_INTERVAL_MINUTES * 60)
-    )
-    User.replace(
-        chat_id=chat_id, next_ping=next_ping, name=username
-    ).execute()  # this does an upsert
+    next_ping = max(user.next_ping for user in ids) if ids else (time_now() + PEE_INTERVAL_MINUTES * 60)
+    User.replace(chat_id=chat_id, next_ping=next_ping, name=username).execute()  # this does an upsert
 
 
 def get_time_in_berlin():
@@ -72,7 +69,8 @@ def get_time_in_berlin():
 def remind_iterator() -> bool:
     """Return False to indicate we should be quiet"""
     berlin_now = get_time_in_berlin()
-    if berlin_now.hour >= 22 or (berlin_now.hour, berlin_now.minute) <= (8, 30):
+    hour_minute = (berlin_now.hour, berlin_now.minute)
+    if NOTIF_END <= hour_minute or NOTIF_START >= hour_minute:
         # quiet at night
         return False
 
@@ -197,8 +195,14 @@ def handle_your_dog_command(message):
         )
 
 
-def time_now():
+def time_now() -> int:
+    """Returns time now in seconds since unix epoch. Extracted to a function for easy mocking"""
     return int(time.time())
+
+
+def modify_time_now(**kwargs) -> int:
+    """Like time_now() but with some fields (hours, minute, year, etc) modified"""
+    return int(datetime.datetime.fromtimestamp(time_now(), tz=datetime.timezone.utc).replace(**kwargs).timestamp())
 
 
 @bot.message_handler(func=lambda message: True)
@@ -213,9 +217,15 @@ def handle_message(message):
         sub = User.get(User.chat_id == this_chat_id)
         write_pepee_time(sub.chat_id)
 
-        next_pee = time_now() + (
-            PEE_INTERVAL_MINUTES * 60
-        )  # when she should really pee by regardless of who's on duty
+        # when she should really pee by regardless of who's on duty
+        next_pee: int = min(
+            [
+                # the usual pee logic
+                time_now() + (PEE_INTERVAL_MINUTES * 60),
+                # ensure she pees before bed. notify early enough that we get at least 2 nags before quiet time
+                modify_time_now(hour=NOTIF_END[0], minute=NOTIF_END[1] - NAG_INTERVAL_MINUTES - 5),
+            ]
+        )
         for u in User.select():
             u.next_ping = max(next_pee, u.next_ping)
             u.save()

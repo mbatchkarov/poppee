@@ -49,7 +49,7 @@ def get_last_pee_time() -> float:
 
 def subscribe(chat_id: int, username: str):
     ids = User.select()
-    num_users = User.select.count()
+    num_users = User.select().count()
     if num_users >= 2:
         raise ValueError('too many users')
     next_ping = max(user.next_ping for user in ids) if ids else (time_now() + PEE_INTERVAL_MINUTES * 60)

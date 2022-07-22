@@ -49,6 +49,9 @@ def get_last_pee_time() -> float:
 
 def subscribe(chat_id: int, username: str):
     ids = User.select()
+    num_users = User.select.count()
+    if num_users >= 2:
+        raise ValueError('too many users')
     next_ping = max(user.next_ping for user in ids) if ids else (time_now() + PEE_INTERVAL_MINUTES * 60)
     User.replace(chat_id=chat_id, next_ping=next_ping, name=username).execute()  # this does an upsert
 
@@ -73,7 +76,6 @@ def remind_iterator() -> bool:
     if NOTIF_END <= hour_minute or NOTIF_START >= hour_minute:
         # quiet at night
         return False
-
     time_since_pee_s = time_now() - get_last_pee_time()
     for user in User.select():
         if user.next_ping < time_now():
@@ -243,4 +245,4 @@ if __name__ == "__main__":
     get_db(CHAT_IDS_FILE)
     Thread(target=remind, daemon=True).start()
     print("Starting server...")
-    bot.infinity_polling()
+    bot.infinity_polling(timeout=20, long_polling_timeout=20)
